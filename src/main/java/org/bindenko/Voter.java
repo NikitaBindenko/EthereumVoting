@@ -31,7 +31,7 @@ public class Voter {
      */
     public Voter(BigInteger privateKey){
         this.privateKey = privateKey;
-        this.pubKey = g.pow(privateKey.intValue()).mod(p);
+        this.pubKey = g.modPow(privateKey, p);
         votersPubKeys.put(this.pubKey, this);
     }
 
@@ -48,12 +48,12 @@ public class Voter {
             //Вычислил k и K (1 шаг)
             BigInteger k = new BigInteger(256, new Random()).mod(q);
             //BigInteger k = new BigInteger("11");
-            BigInteger bigK = g.pow(k.intValue()).mod(p);
+            BigInteger bigK = g.modPow(k, p);
 
             //сгенерировал c сам (отличие от интерактивной процедуры)(2 шаг)
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(bigK.toByteArray());
-            BigInteger c = new BigInteger(hash).mod(p);
+            BigInteger c = new BigInteger(hash).mod(q);
 
             //Вычислил s (3 шаг)
             BigInteger s = privateKey.multiply(c).add(k).mod(q);
@@ -61,6 +61,13 @@ public class Voter {
             dataToVerifyNIZKP.add(s);
             dataToVerifyNIZKP.add(bigK);
             dataToVerifyNIZKP.add(c);
+
+            BigInteger x = g.modPow(privateKey, p).modPow(c, q).multiply(bigK).mod(q);
+            BigInteger y = pubKey.modPow(c, q).multiply(bigK).mod(q);
+
+            System.out.println("\nПочему NIZKP не выполнить:\nВычисляю разными способами и сравниваю\n" +
+                    x + "=" + y + "=" + g.modPow(s, q));
+
 
         }catch (NoSuchAlgorithmException e){
             System.out.println("Неподдерживаемый алгоритм хэширования!");
@@ -82,9 +89,17 @@ public class Voter {
         BigInteger c = dataToVerify.get(2);
 
         //вычисление выражения и проверка валидности NIZKP
-        BigInteger leftPart = g.pow(s.intValue()).mod(q);
-        BigInteger rightPartX = otherVoter.getPubKey().pow(c.intValue()).mod(q);
-        BigInteger rightPart = rightPartX.multiply(bigK).mod(q);
+//        BigInteger leftPart = g.modPow(s, q);
+//        BigInteger rightPartX = otherVoter.getPubKey().modPow(c, q);
+//        BigInteger rightPart = rightPartX.multiply(bigK).mod(q);
+
+        BigInteger rightPart = g.modPow(s, q);
+        BigInteger leftPart = otherVoter.getPubKey().modPow(c, q).multiply(bigK).mod(q);
+
+
+        System.out.println("\n" + leftPart + "=" + rightPart);
+
+
         return leftPart.equals(rightPart);
     }
 

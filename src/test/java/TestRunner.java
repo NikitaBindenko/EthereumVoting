@@ -28,7 +28,7 @@ public class TestRunner {
             e.printStackTrace();
         }
 
-        CommonVariables.initializePrimeNumbers();
+        CommonVariables.initializePrimeNumbers(16);
         System.out.println("Простые числа, соответствующие номерам кандидатов\t" + CommonVariables.primeNumbers);
         System.out.println("\n");
 
@@ -39,6 +39,12 @@ public class TestRunner {
         System.out.println(a);
         System.out.println(b);
         System.out.println(c);
+    }
+
+    @Test(description = "проверка соответсвия условиям заданных чисел в классе CommonVariables", priority = 0)
+    public void defaultPolynomesVerification() {
+        assertEquals(new BigInteger("0"), p.subtract(BigInteger.ONE).mod(q));
+        assertEquals(new BigInteger("1"), g.modPow(q, p));
     }
 
     @Test(description = "пример процесса голосования", priority = 1)
@@ -71,11 +77,10 @@ public class TestRunner {
     @Test(description = "тестирование работы неинтерактивного доказательства нулевого разглашения", priority = 2)
     public void NIZKPtest() {
 
-//        Voter a = new Voter(new BigInteger("4"), new BigInteger("41"));
-//        Voter b = new Voter(new BigInteger("5"), new BigInteger("35"));
-//        System.out.println(b.verifyNIZKP(a));
+        Voter a = new Voter();
+        Voter b = new Voter();
 
-        assertEquals(true, true);
+        assertTrue(b.verifyNIZKP(a));
     }
 
     @Test(description = "проверка Proposition 1", priority = 3)
