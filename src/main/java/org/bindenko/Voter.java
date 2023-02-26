@@ -122,7 +122,7 @@ public class Voter {
     public BigInteger vote(int votingValue){
         BigInteger v = CommonVariables.primeNumbers.get(votingValue);
         BigInteger GpowXiYi = calculateGpowYi().modPow(this.privateKey, p);
-        return v.multiply(GpowXiYi).mod(p);
+        return v.multiply(GpowXiYi);
     }
 
     /**
@@ -132,12 +132,17 @@ public class Voter {
      *                     каждое из которых соответствует номеру кандидата,
      *                     за которого проголосовал один из участников
      *
-     * @return ArrayList
+     * @return массив количеств голосов за каждого участника
      */
-    public ArrayList<Integer> tally(int votingResult){
-        ArrayList<Integer> ballotDistribution = new ArrayList<>(primeNumbers.size());
-
-
+    public int[] tally(BigInteger votingResult){
+        BigInteger zero = new BigInteger("0");
+        int[] ballotDistribution = new int[primeNumbers.size()];
+        for (int i = 0; i < primeNumbers.size(); i++) {
+            while(votingResult.divideAndRemainder(primeNumbers.get(i))[1].equals(zero)){
+                votingResult = votingResult.divide(primeNumbers.get(i));
+                ballotDistribution[i]++;
+            }
+        }
         return ballotDistribution;
     }
 
@@ -196,6 +201,11 @@ public class Voter {
     public BigInteger getGpowQminusX(){
         BigInteger QminusX = q.subtract(privateKey);
         return g.modPow(QminusX, p);
+    }
+
+    public BigInteger getAdditionalValueToRecoverTallyValue(){
+
+        return new BigInteger("0");
     }
 
     public BigInteger getPubKey(){

@@ -21,4 +21,9 @@ public class Util {
         }
         return result;
     }
+
+    public static int toInt(Object i){
+        BigInteger res = new BigInteger(i.toString());
+        return res.intValue();
+    }
 }
