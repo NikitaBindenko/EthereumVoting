@@ -22,7 +22,7 @@ public class Voter {
      */
     public Voter(){
         privateKey = new BigInteger(256, new Random()).mod(q);
-        pubKey = g.pow(privateKey.intValue()).mod(p);
+        pubKey = g.modPow(privateKey, p);
         votersPubKeys.put(this.pubKey, this);
     }
 
@@ -54,20 +54,12 @@ public class Voter {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(bigK.toByteArray());
             BigInteger c = new BigInteger(hash).mod(q);
-
             //Вычислил s (3 шаг)
-            BigInteger s = privateKey.multiply(c).add(k).mod(q);
+            BigInteger s = q.subtract(privateKey).multiply(c).add(k).mod(q);
 
             dataToVerifyNIZKP.add(s);
             dataToVerifyNIZKP.add(bigK);
             dataToVerifyNIZKP.add(c);
-
-            BigInteger x = g.modPow(privateKey, p).modPow(c, q).multiply(bigK).mod(q);
-            BigInteger y = pubKey.modPow(c, q).multiply(bigK).mod(q);
-
-            System.out.println("\nПочему NIZKP не выполнить:\nВычисляю разными способами и сравниваю\n" +
-                    x + "=" + y + "=" + g.modPow(s, q));
-
 
         }catch (NoSuchAlgorithmException e){
             System.out.println("Неподдерживаемый алгоритм хэширования!");
@@ -89,18 +81,8 @@ public class Voter {
         BigInteger c = dataToVerify.get(2);
 
         //вычисление выражения и проверка валидности NIZKP
-//        BigInteger leftPart = g.modPow(s, q);
-//        BigInteger rightPartX = otherVoter.getPubKey().modPow(c, q);
-//        BigInteger rightPart = rightPartX.multiply(bigK).mod(q);
-
-        BigInteger rightPart = g.modPow(s, q);
-        BigInteger leftPart = otherVoter.getPubKey().modPow(c, q).multiply(bigK).mod(q);
-
-
-        System.out.println("\n" + leftPart + "=" + rightPart);
-
-
-        return leftPart.equals(rightPart);
+        BigInteger SchnorrRight = g.modPow(s, p).multiply(otherVoter.getPubKey().modPow(c, p)).mod(p);
+        return bigK.equals(SchnorrRight);
     }
 
     /**
