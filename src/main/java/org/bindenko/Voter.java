@@ -100,11 +100,19 @@ public class Voter {
     /**
      * Метод позволяет выполнить
      * валидацию голоса другого участника.
+     * Нужно исправить основное выражение в цикле и сделать без использования приватного ключа
+     * (кажется что это работает только для голосования "за" или "против")
      *
      * @return boolean
      */
-    public boolean verifyVotingValueZKP(Voter otherVoter){
-         return true;
+    public boolean verifyVotingValuesZKP(){
+         BigInteger productionResult = BigInteger.ONE;
+        for(Voter otherVoter : votersPubKeys.values()){
+            productionResult =
+                    productionResult.multiply(otherVoter.calculateGpowYi()).mod(otherVoter.getPubKey());
+
+        }
+        return productionResult.mod(p).equals(BigInteger.ONE);
     }
 
     /**
