@@ -89,12 +89,11 @@ public class Voter {
      * Метод позволяет получить данные
      * для валидации голоса другого участника.
      *
-     * @return boolean
+     * @return порождающий многочлен в степени Xi * Yi
      */
-    public ArrayList<BigInteger> getVotingValueZKP(Voter otherVoter){
-         ArrayList<BigInteger> dataToVerifyVotingValues = new ArrayList<>(3);
-
-         return dataToVerifyVotingValues;
+    public BigInteger getVotingValueZKP(){
+        BigInteger XiYi = this.getXiYi();
+        return g.modPow(XiYi, p);
     }
 
     /**
@@ -106,11 +105,9 @@ public class Voter {
      * @return boolean
      */
     public boolean verifyVotingValuesZKP(){
-         BigInteger productionResult = BigInteger.ONE;
+        BigInteger productionResult = BigInteger.ONE;
         for(Voter otherVoter : votersPubKeys.values()){
-            productionResult =
-                    productionResult.multiply(otherVoter.calculateGpowYi()).mod(otherVoter.getPubKey());
-
+            productionResult = productionResult.multiply(otherVoter.getVotingValueZKP());
         }
         return productionResult.mod(p).equals(BigInteger.ONE);
     }
