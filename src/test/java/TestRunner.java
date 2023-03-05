@@ -1,4 +1,5 @@
 import org.bindenko.CommonVariables;
+import org.bindenko.PerformNoVotesFailure;
 import org.bindenko.Voter;
 import org.testng.annotations.*;
 import java.io.*;
@@ -109,5 +110,29 @@ public class TestRunner {
     @Test(description = "проверка валидации голосов участников", priority = 2)
     public void verifyVotingValuesZKPTest() {
         assertTrue(a.verifyVotingValuesZKP());
+    }
+
+    @Test(description = "проверяет алгоритм восстановления результата голосования после того, " +
+            "как несколько зарегестрированных участников не проголосовали", priority = 4)
+    public void performVotingWithNoVotesTest() {
+        ArrayList<Voter> voters = new ArrayList<>(votingValues.size());
+        for(int i = 0; i < votingValues.size(); i++){
+            voters.add(new Voter());
+        }
+        PerformNoVotesFailure test = new PerformNoVotesFailure(voters, votingValues);
+        test.votersRegistrationAndVotingValueGeneration();
+        test.votingSimulationWithoutSomebody();
+    }
+
+    @Test(description = "проверяет алгоритм восстановления результата голосования после того, " +
+            "как несколько зарегестрированных участников не проголосовали", priority = 4)
+    public void performTallyingWithNoVotesTest() {
+        ArrayList<Voter> voters = new ArrayList<>(votingValues.size());
+        for(int i = 0; i < votingValues.size(); i++){
+            voters.add(new Voter());
+        }
+        PerformNoVotesFailure test = new PerformNoVotesFailure(voters, votingValues);
+        test.votersRegistrationAndVotingValueGeneration();
+        test.votingSimulationWithoutSomebody();
     }
 }

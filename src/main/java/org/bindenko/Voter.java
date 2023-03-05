@@ -12,6 +12,7 @@ import static org.bindenko.CommonVariables.*;
 public class Voter {
     private final BigInteger pubKey;
     private final BigInteger privateKey;
+    private BigInteger myPrimeVotingValue = BigInteger.ONE;
     public static HashMap<BigInteger, Voter> votersPubKeys = new HashMap<>();
 
     /**
@@ -124,7 +125,8 @@ public class Voter {
     public BigInteger vote(int votingValue){
         BigInteger v = CommonVariables.primeNumbers.get(votingValue);
         BigInteger GpowXiYi = calculateGpowYi().modPow(this.privateKey, p);
-        return v.multiply(GpowXiYi);
+        this.myPrimeVotingValue = v.multiply(GpowXiYi);
+        return myPrimeVotingValue;
     }
 
     /**
@@ -208,6 +210,10 @@ public class Voter {
     public BigInteger getAdditionalValueToRecoverTallyValue(){
 
         return new BigInteger("0");
+    }
+
+    public BigInteger getVotingValue(){
+        return myPrimeVotingValue;
     }
 
     public BigInteger getPubKey(){
