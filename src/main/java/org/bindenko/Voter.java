@@ -180,8 +180,8 @@ public class Voter {
      * @return XiYi
      */
     public BigInteger getXiYi(){
-        BigInteger sumMoreThenThis = new BigInteger("0");
-        BigInteger sumLessThenThis = new BigInteger("0");
+        BigInteger sumMoreThenThis = BigInteger.ZERO;
+        BigInteger sumLessThenThis = BigInteger.ZERO;
         for(Voter voter : votersPubKeys.values()){
             if(voter.getPubKey().compareTo(this.pubKey) < 0){ //если ключи меньше текущего
                 sumLessThenThis = sumLessThenThis.add(voter.privateKey);
@@ -207,9 +207,36 @@ public class Voter {
         return g.modPow(QminusX, p);
     }
 
-    public BigInteger getAdditionalValueToRecoverTallyValue(){
+    /**
+     * Метод позволяет получить дополнительное значение от участника голосования
+     * для восстановления результата голосования в случае если кто то из участников не проголосовал
+     * для восстановления результата голосования метод должен быть вызван каждым участником
+     * у всех проголосовавших участников, таким образом иммитируется широковещательное распространение.
+     * После распространения значения умножаются друг на друга каждым участником
+     *
+     * @return AdditionalValue
+     */
+    public BigInteger getAdditionalValueToRecoverTallyValue(Voter failedVoter){
+        BigInteger result = BigInteger.ONE;
+        if(failedVoter.getPubKey().compareTo(this.pubKey) > 0){ //тут аккуратно меньше\больше
+            result = failedVoter.getPubKey().modPow(this.privateKey, p);//multiplication.multiply(voter.getPubKey()).mod(p);
+        } else if (failedVoter.getPubKey().compareTo(this.pubKey) < 0) {
+            BigInteger QminusXi = q.subtract(privateKey);
+            result = failedVoter.getPubKey().modPow(QminusXi, p);
+        }
+        return result;
+    }
 
-        return new BigInteger("0");
+    /**
+     * Метод позволяет собрать additionalValue от всех участников голосования
+     * и перемножить их, тем самым восстанавливая результат голосования
+     *
+     * @return tallyValue
+     */
+    public BigInteger collectAdditionalValuesAndRecoverTallyValue(){
+        BigInteger result = BigInteger.ONE;
+
+        return result;
     }
 
     public BigInteger getVotingValue(){

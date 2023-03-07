@@ -37,4 +37,13 @@ public class PerformNoVotesFailure {
             voters.get(i).vote(votingValues.get(i));
         }
     }
+
+    public BigInteger votingModel(){
+        votersRegistrationAndVotingValueGeneration();
+        BigInteger tallyValue = votingSimulationWithoutSomebody();
+
+
+        //return tallyValue.equals();
+        return tallyValue;
+    }
 }

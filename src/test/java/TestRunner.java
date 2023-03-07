@@ -120,19 +120,15 @@ public class TestRunner {
             voters.add(new Voter());
         }
         PerformNoVotesFailure test = new PerformNoVotesFailure(voters, votingValues);
-        test.votersRegistrationAndVotingValueGeneration();
-        test.votingSimulationWithoutSomebody();
+        assertTrue(test.votingModel().equals(BigInteger.ONE));
     }
 
-    @Test(description = "проверяет алгоритм восстановления результата голосования после того, " +
-            "как несколько зарегестрированных участников не проголосовали", priority = 4)
+    @Test(description = "проверяет алгоритм подсчета результатов голосования после того, " +
+            "как несколько зарегестрированных участников не проголосовали и результат голосования" +
+            "был восстановлен",
+            priority = 4, dependsOnMethods = "performVotingWithNoVotesTest")
     public void performTallyingWithNoVotesTest() {
-        ArrayList<Voter> voters = new ArrayList<>(votingValues.size());
-        for(int i = 0; i < votingValues.size(); i++){
-            voters.add(new Voter());
-        }
-        PerformNoVotesFailure test = new PerformNoVotesFailure(voters, votingValues);
-        test.votersRegistrationAndVotingValueGeneration();
-        test.votingSimulationWithoutSomebody();
+
+        assertTrue(false);
     }
 }
