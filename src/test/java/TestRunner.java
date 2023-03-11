@@ -36,10 +36,6 @@ public class TestRunner {
         a = new Voter();
         b = new Voter();
         c = new Voter();
-
-        System.out.println(a);
-        System.out.println(b);
-        System.out.println(c);
     }
 
     @Test(description = "проверка соответсвия условиям заданных чисел в классе CommonVariables", priority = 0)
@@ -113,22 +109,14 @@ public class TestRunner {
     }
 
     @Test(description = "проверяет алгоритм восстановления результата голосования после того, " +
-            "как несколько зарегестрированных участников не проголосовали", priority = 4)
+            "как несколько зарегестрированных участников не проголосовали", priority = 5)
     public void performVotingWithNoVotesTest() {
+        Voter.votersPubKeys.clear(); //очищаю таблицу так как создаю новые обьекты для нового теста
         ArrayList<Voter> voters = new ArrayList<>(votingValues.size());
         for(int i = 0; i < votingValues.size(); i++){
             voters.add(new Voter());
         }
         PerformNoVotesFailure test = new PerformNoVotesFailure(voters, votingValues);
-        assertTrue(test.votingModel().equals(BigInteger.ONE));
-    }
-
-    @Test(description = "проверяет алгоритм подсчета результатов голосования после того, " +
-            "как несколько зарегестрированных участников не проголосовали и результат голосования" +
-            "был восстановлен",
-            priority = 4, dependsOnMethods = "performVotingWithNoVotesTest")
-    public void performTallyingWithNoVotesTest() {
-
-        assertTrue(false);
+        assertEquals(test.votingModel(), tallyValue);
     }
 }

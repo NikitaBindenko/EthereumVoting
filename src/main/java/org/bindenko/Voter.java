@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 
 import static org.bindenko.CommonVariables.*;
@@ -12,7 +13,7 @@ import static org.bindenko.CommonVariables.*;
 public class Voter {
     private final BigInteger pubKey;
     private final BigInteger privateKey;
-    private BigInteger myPrimeVotingValue = BigInteger.ONE;
+    private BigInteger myVotingValue;
     public static HashMap<BigInteger, Voter> votersPubKeys = new HashMap<>();
 
     /**
@@ -25,6 +26,7 @@ public class Voter {
         privateKey = new BigInteger(256, new Random()).mod(q);
         pubKey = g.modPow(privateKey, p);
         votersPubKeys.put(this.pubKey, this);
+        myVotingValue = BigInteger.ONE;
     }
 
     /**
@@ -123,10 +125,14 @@ public class Voter {
      * @return BigInteger зашифрованное значение голоса
      */
     public BigInteger vote(int votingValue){
+        if(votingValue < 0){
+            myVotingValue = BigInteger.ONE;
+            return myVotingValue;
+        }
         BigInteger v = CommonVariables.primeNumbers.get(votingValue);
         BigInteger GpowXiYi = calculateGpowYi().modPow(this.privateKey, p);
-        this.myPrimeVotingValue = v.multiply(GpowXiYi);
-        return myPrimeVotingValue;
+        this.myVotingValue = v.multiply(GpowXiYi);
+        return myVotingValue;
     }
 
     /**
@@ -208,21 +214,25 @@ public class Voter {
     }
 
     /**
-     * Метод позволяет получить дополнительное значение от участника голосования
+     * Метод позволяет получить произведение дополнительных значений для участника голосования
      * для восстановления результата голосования в случае если кто то из участников не проголосовал
      * для восстановления результата голосования метод должен быть вызван каждым участником
      * у всех проголосовавших участников, таким образом иммитируется широковещательное распространение.
      * После распространения значения умножаются друг на друга каждым участником
      *
-     * @return AdditionalValue
+     * @return произведение AdditionalValue для одного из участников
      */
-    public BigInteger getAdditionalValueToRecoverTallyValue(Voter failedVoter){
+    public BigInteger getAdditionalValueToRecoverTallyValue(LinkedList<Voter> failedVoters){
         BigInteger result = BigInteger.ONE;
-        if(failedVoter.getPubKey().compareTo(this.pubKey) > 0){ //тут аккуратно меньше\больше
-            result = failedVoter.getPubKey().modPow(this.privateKey, p);//multiplication.multiply(voter.getPubKey()).mod(p);
-        } else if (failedVoter.getPubKey().compareTo(this.pubKey) < 0) {
-            BigInteger QminusXi = q.subtract(privateKey);
-            result = failedVoter.getPubKey().modPow(QminusXi, p);
+        for(Voter failedVoter : failedVoters) {
+            BigInteger additionalValue = BigInteger.ONE;
+            if (failedVoter.getPubKey().compareTo(this.pubKey) > 0) { //тут аккуратно меньше\больше
+                additionalValue = failedVoter.getPubKey().modPow(this.privateKey, p);
+            } else if (failedVoter.getPubKey().compareTo(this.pubKey) < 0) {
+                BigInteger QminusXi = q.subtract(privateKey);
+                additionalValue = failedVoter.getPubKey().modPow(QminusXi, p);
+            }
+            result = result.multiply(additionalValue);
         }
         return result;
     }
@@ -240,7 +250,7 @@ public class Voter {
     }
 
     public BigInteger getVotingValue(){
-        return myPrimeVotingValue;
+        return myVotingValue;
     }
 
     public BigInteger getPubKey(){

@@ -2,10 +2,12 @@ package org.bindenko;
 
 import java.util.ArrayList;
 import java.math.BigInteger;
+import java.util.LinkedList;
 
 public class PerformNoVotesFailure {
     private final ArrayList<Voter> voters;
     private final ArrayList<Integer> votingValues;
+    private LinkedList<Voter> failedVoters = new LinkedList<>();
 
     public PerformNoVotesFailure(ArrayList<Voter> voters, ArrayList<Integer> votingValues){
         this.voters = voters;
@@ -18,9 +20,13 @@ public class PerformNoVotesFailure {
     public BigInteger votingSimulationWithoutSomebody(){
         BigInteger tallyValue = BigInteger.ONE;
         for(Voter voter : voters){
-            tallyValue = tallyValue.multiply(voter.getVotingValue());
+            BigInteger votingValue = voter.getVotingValue();
+            tallyValue = tallyValue.multiply(votingValue);
+            if(votingValue.equals(BigInteger.ONE)){
+                failedVoters.add(voter);
+            }
         }
-        return tallyValue;
+        return tallyValue.mod(CommonVariables.p);
     }
 
     /**
@@ -38,12 +44,34 @@ public class PerformNoVotesFailure {
         }
     }
 
+    /**
+     * Метод выполняет получение всеми участниками голосования
+     * дополнительных данных для восстановления tallyValue, после того,
+     * как один/несколько участников голосования не проголосовали
+     *
+     * @return recoveredResult
+     */
+    public BigInteger tallyValueRecovery(){
+        BigInteger recoveredResult = BigInteger.ONE;
+        for(Voter voter : voters){
+            if(voter.getVotingValue().equals(BigInteger.ONE)){
+                continue;
+            }
+            recoveredResult =
+                    recoveredResult.multiply(voter.getAdditionalValueToRecoverTallyValue(failedVoters));
+        }
+        return recoveredResult.mod(CommonVariables.p);
+    }
+
     public BigInteger votingModel(){
         votersRegistrationAndVotingValueGeneration();
+
         BigInteger tallyValue = votingSimulationWithoutSomebody();
+        System.out.println("Невалидный tally Value:\t" + tallyValue);
 
+        BigInteger recoveredTallyValue = tallyValueRecovery();
+        System.out.println("Восстановленный tally Value:\t" + recoveredTallyValue);
 
-        //return tallyValue.equals();
         return tallyValue;
     }
 }
