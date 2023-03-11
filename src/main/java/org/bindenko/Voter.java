@@ -36,6 +36,7 @@ public class Voter {
         this.privateKey = privateKey;
         this.pubKey = g.modPow(privateKey, p);
         votersPubKeys.put(this.pubKey, this);
+        myVotingValue = BigInteger.ONE;
     }
 
     /**

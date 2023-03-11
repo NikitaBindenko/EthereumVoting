@@ -36,6 +36,10 @@ public class TestRunner {
         a = new Voter();
         b = new Voter();
         c = new Voter();
+
+        System.out.println(a);
+        System.out.println(b);
+        System.out.println(c);
     }
 
     @Test(description = "проверка соответсвия условиям заданных чисел в классе CommonVariables", priority = 0)

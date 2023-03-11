@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.math.BigInteger;
 import java.util.LinkedList;
 
+import static org.bindenko.CommonVariables.p;
+
 public class PerformNoVotesFailure {
     private final ArrayList<Voter> voters;
     private final ArrayList<Integer> votingValues;
@@ -69,9 +71,9 @@ public class PerformNoVotesFailure {
         BigInteger tallyValue = votingSimulationWithoutSomebody();
         System.out.println("Невалидный tally Value:\t" + tallyValue);
 
-        BigInteger recoveredTallyValue = tallyValueRecovery();
+        BigInteger recoveredTallyValue = tallyValueRecovery().multiply(tallyValue).mod(p);
         System.out.println("Восстановленный tally Value:\t" + recoveredTallyValue);
 
-        return tallyValue;
+        return recoveredTallyValue;
     }
 }
