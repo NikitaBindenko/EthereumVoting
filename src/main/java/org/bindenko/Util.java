@@ -1,29 +1,29 @@
 package org.bindenko;
 
-import java.math.BigInteger;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Util {
-    public static BigInteger pow(BigInteger a, BigInteger b, BigInteger modulo){
-        BigInteger counter = new BigInteger("0");
-        BigInteger result = new BigInteger("1");
-        for(; counter.compareTo(b) < 0; counter = counter.add(new BigInteger("1"))){
-            result = result.multiply(a).mod(modulo);
-        }
-        return result;
-    }
 
-    BigInteger pow(BigInteger base, BigInteger exponent) {
-        BigInteger result = BigInteger.ONE;
-        while (exponent.signum() > 0) {
-            if (exponent.testBit(0)) result = result.multiply(base);
-            base = base.multiply(base);
-            exponent = exponent.shiftRight(1);
+    public static ArrayList<Integer> readFile(String filePath){
+        ArrayList<Integer> votingValues = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            String line = reader.readLine();
+            while (line != null) {
+                votingValues.add(Integer.valueOf(line));
+                line = reader.readLine();
+            }
+            System.out.println("Голоса участников:\t" + votingValues);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return result;
-    }
 
-    public static int toInt(Object i){
-        BigInteger res = new BigInteger(i.toString());
-        return res.intValue();
+        CommonVariables.initializePrimeNumbers(Collections.max(votingValues) + 1);
+        System.out.println("Простые числа, соответствующие номерам кандидатов\t" + CommonVariables.primeNumbers);
+        System.out.println("\n");
+        return votingValues;
     }
 }

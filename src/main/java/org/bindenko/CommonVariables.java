@@ -12,16 +12,17 @@ public class CommonVariables {
     /**
      * Метод инициадизирует ряд простых чисел в зависимости от параметра
      *
-     * @param upperLimit верхний предел ряда простых чисел (необязательно простой)
+     * @param numberOfCandidates количество кандидатов, для которых будут сгенерированы
+     *                              соответствующие простые числа
      */
-    public static void initializePrimeNumbers(int upperLimit){
-        BigInteger seed;
-        BigInteger limit = new BigInteger(String.valueOf(upperLimit));
-        BigInteger nextPrimeNumber = new BigInteger("2");
-
-        for(; nextPrimeNumber.intValue() < limit.intValue(); nextPrimeNumber = seed.nextProbablePrime()){
+    public static void initializePrimeNumbers(int numberOfCandidates){
+        BigInteger seed = BigInteger.ONE;
+        int i = 0;
+        while(i < numberOfCandidates){
+            BigInteger nextPrimeNumber = seed.nextProbablePrime();
             primeNumbers.add(nextPrimeNumber);
             seed = nextPrimeNumber;
+            i++;
         }
     }
 }

@@ -5,6 +5,7 @@ import org.testng.annotations.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.bindenko.CommonVariables.*;
 import static org.testng.Assert.*;
@@ -18,7 +19,7 @@ public class TestRunner {
     public void testPreparation() {
         try {
             votingValues = new ArrayList<>();
-            BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/votingValues.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/votingValuesForTest.txt"));
             String line = reader.readLine();
             while (line != null) {
                 votingValues.add(Integer.valueOf(line));
@@ -29,7 +30,7 @@ public class TestRunner {
             e.printStackTrace();
         }
 
-        CommonVariables.initializePrimeNumbers(16);
+        CommonVariables.initializePrimeNumbers(Collections.max(votingValues) + 1);
         System.out.println("Простые числа, соответствующие номерам кандидатов\t" + CommonVariables.primeNumbers);
         System.out.println("\n");
 

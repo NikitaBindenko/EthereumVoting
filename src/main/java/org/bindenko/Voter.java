@@ -15,6 +15,7 @@ public class Voter {
     private final BigInteger privateKey;
     private BigInteger myVotingValue;
     public static HashMap<BigInteger, Voter> votersPubKeys = new HashMap<>();
+    public static LinkedList<Voter> failedVoters = new LinkedList<>();
 
     /**
      * Конструктор генерирует закрытый и открытый ключи,
@@ -146,7 +147,7 @@ public class Voter {
      * @return массив количеств голосов за каждого участника
      */
     public int[] tally(BigInteger votingResult){
-        BigInteger zero = new BigInteger("0");
+        BigInteger zero = BigInteger.ZERO;
         int[] ballotDistribution = new int[primeNumbers.size()];
         for (int i = 0; i < primeNumbers.size(); i++) {
             while(votingResult.divideAndRemainder(primeNumbers.get(i))[1].equals(zero)){
@@ -239,15 +240,22 @@ public class Voter {
     }
 
     /**
-     * Метод позволяет собрать additionalValue от всех участников голосования
+     * Метод позволяет вычислить tallyValue, и, если кому то из участников
+     * не удалось проголосовать, собрать additionalValue от всех участников голосования
      * и перемножить их, тем самым восстанавливая результат голосования
      *
      * @return tallyValue
      */
-    public BigInteger collectAdditionalValuesAndRecoverTallyValue(){
-        BigInteger result = BigInteger.ONE;
-
-        return result;
+    public BigInteger getValidTallyValue(){
+        BigInteger tallyValue = BigInteger.ONE;
+        for(Voter voter : votersPubKeys.values()){
+            BigInteger votingValue = voter.getVotingValue();
+            tallyValue = tallyValue.multiply(votingValue);
+            if(votingValue.equals(BigInteger.ONE)){
+                Voter.failedVoters.add(voter);
+            }
+        }
+        return tallyValue.mod(p);
     }
 
     public BigInteger getVotingValue(){
