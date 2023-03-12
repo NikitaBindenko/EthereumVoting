@@ -15,7 +15,7 @@ public class Voter {
     private final BigInteger privateKey;
     private BigInteger myVotingValue;
     public static HashMap<BigInteger, Voter> votersPubKeys = new HashMap<>();
-    public static LinkedList<Voter> failedVoters = new LinkedList<>();
+    public LinkedList<Voter> failedVoters = new LinkedList<>();
 
     /**
      * Конструктор генерирует закрытый и открытый ключи,
@@ -166,7 +166,7 @@ public class Voter {
      * @return BigInteger g в степени y
      */
     private BigInteger calculateGpowYi(){
-        BigInteger multiplication = new BigInteger("1");
+        BigInteger multiplication = BigInteger.ONE;
         for(Voter voter : votersPubKeys.values()){
             if(voter.getPubKey().compareTo(this.pubKey) < 0){ //если ключи меньше текущего
                 multiplication = multiplication.multiply(voter.getPubKey()).mod(p);
@@ -240,22 +240,44 @@ public class Voter {
     }
 
     /**
-     * Метод позволяет вычислить tallyValue, и, если кому то из участников
-     * не удалось проголосовать, собрать additionalValue от всех участников голосования
-     * и перемножить их, тем самым восстанавливая результат голосования
+     * Метод позволяет вычислить первоначальный tallyValue
      *
      * @return tallyValue
      */
-    public BigInteger getValidTallyValue(){
+    private BigInteger getTallyValueWithFails(){
         BigInteger tallyValue = BigInteger.ONE;
         for(Voter voter : votersPubKeys.values()){
             BigInteger votingValue = voter.getVotingValue();
             tallyValue = tallyValue.multiply(votingValue);
             if(votingValue.equals(BigInteger.ONE)){
-                Voter.failedVoters.add(voter);
+                failedVoters.add(voter);
             }
         }
         return tallyValue.mod(p);
+    }
+
+    /**
+     * Метод позволяет вычислить tallyValue, и, если кому то из участников
+     * не удалось проголосовать, собрать additionalValue от всех участников голосования
+     * и перемножить их, тем самым восстанавливая результат голосования
+     *
+     * @return validTallyValue
+     */
+    public BigInteger getValidTallyValue(){
+        BigInteger recoveredResult = BigInteger.ONE;
+        BigInteger tallyValueWithFails = getTallyValueWithFails();
+        if(failedVoters.size() != 0) { //если есть провалившиеся участники восстанавливаем
+            for (Voter voter : votersPubKeys.values()) {
+                if (voter.getVotingValue().equals(BigInteger.ONE)) {
+                    continue;
+                }
+                recoveredResult =
+                        recoveredResult.multiply(voter.getAdditionalValueToRecoverTallyValue(failedVoters));
+            }
+            return recoveredResult.multiply(tallyValueWithFails).mod(p);
+        }else{
+            return tallyValueWithFails;
+        }
     }
 
     public BigInteger getVotingValue(){
