@@ -24,12 +24,17 @@ import java.util.Arrays;
  * Также выводится информационное сообщение, указывающее на то,
  * какие аргументы командной строки были переданы
  *
- * Резульататом работы программы является список участников голосования, для каждого из которых указаны
+ * В программе выполняется моделирование следующих этапов голосования:
+ * Регистрация участников, проверка участниками ключей друг друга, голосование, подсчет голосов
+ *
+ * Результатом работы программы является список участников голосования, для каждого из которых указаны
  * значение голоса, которое участник отправил остальным участникам голосования и результат голосования
  * и наглядное представление распределения голосов среди кандидатов в виде массива, где номеру элемента
  * массива соответствует число голосов, которое набрал участник с этим номером.
  * Идентификатором участника голосования служит публичный ключ участника (как в сети Ethereum)
  *
+ * Формат запуска JAR-файла с аргументами командной строки, где любой из аргументов может быть опущен:
+ * java -jar Voting.jar 6 votingValuesCustom.txt
  */
 public class Main {
     public static String defaultPath = "src/main/resources/votingValues.txt";
@@ -63,6 +68,19 @@ public class Main {
         for (Integer votingValue : votingValues) {
             Voter voter = new Voter();
             voters.add(voter);
+        }
+
+        //Проверка NIZKP
+        for(int i = 0; i < voters.size(); i++){
+            for(int j = 0; j < voters.size(); j++){
+                if(i == j){continue;}
+                boolean voterVerifiedSuccessfully = voters.get(i).verifyNIZKP(voters.get(j));
+                if(voterVerifiedSuccessfully) {
+                    System.out.println("Voter " + voters.get(j).getPubKey() + " successfully verified by Voter " + voters.get(i).getPubKey());
+                }else{
+                    System.out.println("Voter " + voters.get(j).getPubKey() + " verification failed by Voter " + voters.get(i).getPubKey());
+                }
+            }
         }
 
         //голосование

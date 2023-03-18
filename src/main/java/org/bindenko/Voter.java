@@ -136,7 +136,7 @@ public class Voter {
             v = CommonVariables.primeNumbers.get(votingValue);
         }catch (IndexOutOfBoundsException e){
             v = BigInteger.ONE;
-            System.out.println("Voter " + this.getPubKey() + "\tГолос этого участника не засчитан (номер кандидата невалиден)");
+            System.out.println("\nVoter " + this.getPubKey() + "\tГолос этого участника не засчитан (номер кандидата невалиден)");
         }
         BigInteger GpowXiYi = calculateGpowYi().modPow(this.privateKey, p);
         this.myVotingValue = v.multiply(GpowXiYi);
