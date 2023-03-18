@@ -7,7 +7,7 @@ import java.util.Collections;
 
 public class Util {
 
-    public static ArrayList<Integer> readFile(String filePath){
+    public static ArrayList<Integer> readFile(Integer numberOfCandidates, String filePath){
         ArrayList<Integer> votingValues = new ArrayList<>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -18,10 +18,15 @@ public class Util {
             }
             System.out.println("Голоса участников:\t" + votingValues);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Не найден указанный файл");
+            System.exit(0);
         }
 
-        CommonVariables.initializePrimeNumbers(Collections.max(votingValues) + 1);
+        if(numberOfCandidates == null) {
+            CommonVariables.initializePrimeNumbers(Collections.max(votingValues) + 1);
+        }else{
+            CommonVariables.initializePrimeNumbers(numberOfCandidates);
+        }
         System.out.println("Простые числа, соответствующие номерам кандидатов\t" + CommonVariables.primeNumbers);
         System.out.println("\n");
         return votingValues;
