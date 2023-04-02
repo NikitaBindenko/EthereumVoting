@@ -13,10 +13,10 @@ https://docs.google.com/document/d/1TSwMQvPOnMTs8jAozxM94KEvyb64eRkfbpN_Xx1uUXg/
 После этого во вкладке Deployed Contracts с контрактом можно взаимодействовать с помощью кнопок, соответствующих реализованным методам (), в поле ACCOUNT можно переключаться между адресами Ethereum и вызывать методы от их имени имитируя действия пользователей. В окне снизу выводятся все записанные транзакции. Поле Value предназначено для указания значения Эфира, который пользователь хочет отправить на другой адрес. 
 
 Чтобы установить Truffle на Ubuntu: (https://ubunlog.com/en/nodejs-npm-installation-ubuntu-20-04-18-04/)
-`sudo apt install curl`
-`curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash –`
-`sudo apt install nodejs`
-`npm install –g truffle`
+`sudo apt install curl`⋅⋅
+`curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash –`⋅⋅
+`sudo apt install nodejs`⋅⋅
+`npm install –g truffle`⋅⋅
 
 Другой, более мощный инструмент для разработки смарт-контрактов – truffle. В рамках этой работы его функционал может быть избыточен, однако он может быть полезен при написании автотестов, также позволяет более гибко управлять деплоем и тестовой сетью (или развернуть контракт в публичной тестовой сети).
 Создать папку для проектов и выполнить в ней команду
